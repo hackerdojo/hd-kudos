@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+<p>You have: {{profile.total_kudos}} kudos total</p>
+<p>You have: {{profile.points}} points remaining to give</p>
+{% ifequal profile.points 0 %}
+{% else %}
+<p><form action="/" method="post">
+  Give
+    <select name="points">
+      {% for points in point_options %}<option>{{points}}</option>{% endfor %}
+    </select>
+  kudo points to 
+    <select name="user_to">
+      {% for username in usernames %}
+        <option value="{{username}}">{{username}}</option>
+      {% endfor %}
+    </select> <input type="submit" value="Give em" />
+  </form></p>
+{% endifequal %}
+{% endblock %}
