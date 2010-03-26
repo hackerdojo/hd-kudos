@@ -148,7 +148,7 @@ class CronHandler(webapp.RequestHandler):
                 if not memcache.get('reset_%s' % profile.key().id()):
                     profile.to_give = MONTHLY_POINTS
                     profile.gave_this_month = 0
-                    profile.received_month = 0
+                    profile.received_this_month = 0
                     profile.put()
                     memcache.set('reset_%s' % profile.key().id(), True, 3600*24)
 
