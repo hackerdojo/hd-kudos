@@ -1,20 +1,82 @@
 {% extends 'base.html' %}
 {% block content %}
-<p>You have: {{profile.total_kudos}} kudos total</p>
-<p>You have: {{profile.points}} points remaining to give</p>
-{% ifequal profile.points 0 %}
+<script type="text/javascript">
+  var names = {{names}};
+  var usernames = {{usernames}};
+  function setUser(name) {
+    var name = name.trim();
+    if ($.inArray(name, names) != -1) {
+      $('#user_to').val(usernames[name]);
+      $('#submit')[0].disabled = false;
+    } else {
+      $('#submit')[0].disabled = true;
+    }
+    
+  }
+</script>
+<div id="primary" style="padding-top: -10px;">
+
+<h2>Give kudos</h2>
+{% if user %}
+<form action="/" method="post" onsubmit="return !$('#submit')[0].disabled">
+  <table>
+    {% ifequal profile.to_give 0 %}
+    {% else %}
+    <tr><td class="label">Who gets kudos:</td><td class="label">How much:</td><td></td></tr>
+    <tr><td>
+      <input type="text" onkeyup="setUser(this.value)" id="user_name" size="18" style="font-size: 18px;"/> 
+      <input type="hidden" name="user_to" id="user_to" />    
+    </td><td>
+      <select name="points" style="color: #d50025; font-size: 14px;">
+        {% for points in point_options %}<option value="{{points.0}}">{{points.1}}</option>{% endfor %}
+      </select>
+    </td><td>
+      <input type="submit" disabled="disabled" id="submit" value="Give em" />
+    </td></tr>
+    {% endifequal %}
+    
+    <tr><td colspan="3" class="label">You have {{profile.to_give}} left to give this month</td></tr>
+    <tr><td colspan="3" style="font-size: 32px; line-height: 20px;"><span style="color: #d50025;">{{points_remaining}}</span>{{points_used}}
+</td></tr>
+  </table>    
+  </form>
 {% else %}
-<p><form action="/" method="post">
-  Give
-    <select name="points">
-      {% for points in point_options %}<option>{{points}}</option>{% endfor %}
-    </select>
-  kudo points to 
-    <select name="user_to">
-      {% for username in usernames %}
-        <option value="{{username}}">{{username}}</option>
-      {% endfor %}
-    </select> <input type="submit" value="Give em" />
-  </form></p>
-{% endifequal %}
+<p><a href="{{login_url}}">Login</a> to give kudos!</p>
+{% endif %}
+  
+{% if user %}
+<h2>Received kudos</h2>
+<table style="margin-top: -10px;">
+  <tr><td style="font-size: 38px; font-weight: bold; text-align: right;">{{profile.received_this_month}}</td><td>kudos received this month</td></tr>
+  <tr><td style="font-size: 24px; font-weight: bold;  text-align: right;">{{profile.received_total}}</td><td>kudos received ever</td></tr>
+</table>
+{% endif %}
+
+  
+<h2>Most kudos this month</h2>
+<div style="overflow: auto; width: 100%;">
+<div style="float: left; margin-right: 80px;">
+<h3 style="margin-left: 20px; margin-bottom: 0px;">Received</h3>
+<table>
+{% for p in receive_leaders %}
+<tr><td style="font-size: 24px; font-weight: bold;  text-align: right;">{{p.received_this_month}}</td><td>{{p.fullname}}</td></tr>
+{% endfor %}
+</table>
+</div>
+
+<div style="float: left;">
+<h3 style="margin-left: 20px; margin-bottom: 0px;">Gave</h3>
+<table>
+{% for p in give_leaders %}
+<tr><td style="font-size: 24px; font-weight: bold;  text-align: right;">{{p.gave_this_month}}</td><td>{{p.fullname}}</td></tr>
+{% endfor %}
+</table>
+</div>
+</div>
+
+</div>
+
+<script type="text/javascript">
+  $("#user_name").autocomplete(names);
+</script>
 {% endblock %}
