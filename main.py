@@ -59,6 +59,23 @@ class Profile(db.Model):
             profile.put()
         return profile
     
+    @classmethod
+    def top_receivers_this_month(cls, refresh=False):
+        receivers = memcache.get('top_receivers_this_month')
+        if not receivers or refresh:
+            receivers = cls.all().filter('received_this_month >', 0).order('-received_this_month')
+            memcache.set('top_receivers_this_month', receivers, 300)
+        return receivers
+    
+    @classmethod
+    def top_givers_this_month(cls, refresh=False):
+        givers = memcache.get('top_givers_this_month')
+        if not givers or refresh:
+            givers = cls.all().filter('gave_this_month >', 0).order('-gave_this_month')
+            memcache.set('top_givers_this_month', givers, 300)
+        return givers
+            
+    
 class Kudos(db.Model):
     user_from = db.UserProperty(auto_current_user_add=True)
     user_to = db.UserProperty(required=True)
@@ -91,8 +108,8 @@ class MainHandler(webapp.RequestHandler):
         names = simplejson.dumps(names)
         
         # monthly leader board
-        receive_leaders = Profile.all().filter('received_this_month >', 0).order('-received_this_month')
-        give_leaders = Profile.all().filter('gave_this_month >', 0).order('-gave_this_month')
+        receive_leaders = Profile.top_receivers_this_month()
+        give_leaders = Profile.top_givers_this_month()
         self.response.out.write(template.render('templates/main.html', locals()))
 
     def post(self):
