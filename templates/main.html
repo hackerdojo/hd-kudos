@@ -3,8 +3,8 @@
 <script type="text/javascript">
   var names = {{names}};
   var usernames = {{usernames}};
-  function setUser(name) {
-    var name = name.trim();
+  function updateUser() {
+    var name = $('#user_name').val().trim();
     if ($.inArray(name, names) != -1) {
       $('#user_to').val(usernames[name]);
       $('#submit')[0].disabled = false;
@@ -24,7 +24,7 @@
     {% else %}
     <tr><td class="label">Who gets kudos:</td><td class="label">How much:</td><td></td></tr>
     <tr><td>
-      <input type="text" onkeyup="setUser(this.value)" id="user_name" size="18" style="font-size: 18px;"/> 
+      <input type="text" onkeyup="updateUser()" onblur="updateUser()" id="user_name" size="18" style="font-size: 18px;"/> 
       <input type="hidden" name="user_to" id="user_to" />    
     </td><td>
       <select name="points" style="color: #d50025; font-size: 14px;">
