@@ -140,10 +140,14 @@ class MainHandler(webapp.RequestHandler):
         from_profile.put()
         self.redirect('/')
 
-class CronHandler(webapp.RequestHandler):        
+class CronHandler(webapp.RequestHandler):  
+    #def get(self):
+    #    self.post()
+    
     def post(self):
         # check if day of month = 1
-        if datetime.datetime.today().day == 1:
+        day = datetime.datetime.today().day
+        if day == 1:
             for profile in Profile.all():
                 if not memcache.get('reset_%s' % profile.key().id()):
                     profile.to_give = MONTHLY_POINTS
@@ -151,6 +155,9 @@ class CronHandler(webapp.RequestHandler):
                     profile.received_this_month = 0
                     profile.put()
                     memcache.set('reset_%s' % profile.key().id(), True, 3600*24)
+            self.response.out.write("Finished.")
+        else:
+            self.response.out.write("Wrong day: %s" % day)
 
 def main():
     application = webapp.WSGIApplication([
