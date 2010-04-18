@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<div id="primary" style="padding-top: -10px; text-align: center;">
+  <h1>Certificate of Kudos</h1>
+  <em>{{kudos.from_profile.fullname}} has praised</em>
+  <h1 style="margin-top: 5px; margin-bottom: 10px;">{{kudos.to_profile.fullname}}<br /><span style="color: #d50025;">{{kudos.hearts}}</span></h1>
+  <em>with {{kudos.amount}} kudos {% if kudos.reason %}for</em>
+  <h2>{{kudos.reason}}</h2>
+  <em>{% endif %}on the day of {{kudos.created|date:"F j, Y"}}</em>
+  <p style="margin: 25px;">The Dojo community is better from their efforts.</p>
+  <a href="/" style="color: gray; font-size: smaller;">&larr; Back to Kudos</a>
+</div>
+
+{% endblock %}

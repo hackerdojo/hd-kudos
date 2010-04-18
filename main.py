@@ -80,7 +80,17 @@ class Kudos(db.Model):
     user_from = db.UserProperty(auto_current_user_add=True)
     user_to = db.UserProperty(required=True)
     amount = db.IntegerProperty(required=True)
+    reason = db.StringProperty()
     created = db.DateTimeProperty(auto_now_add=True)
+    
+    def from_profile(self):
+        return Profile.all().filter('user =', self.user_from).get()
+        
+    def to_profile(self):
+        return Profile.all().filter('user =', self.user_to).get()
+    
+    def hearts(self):
+        return "&hearts;" * self.amount
     
 class MainHandler(webapp.RequestHandler):
     def get(self):
@@ -130,7 +140,8 @@ class MainHandler(webapp.RequestHandler):
         to_profile.put()
         kudos = Kudos(
             user_to=to_profile.user,
-            amount =kudos_to_give
+            amount =kudos_to_give,
+            reason =self.request.get('reason'),
             )
         kudos.put()
         # if you try to give yourself kudos, you lose the points, as this put overwrites to_profile.put
@@ -138,7 +149,15 @@ class MainHandler(webapp.RequestHandler):
         from_profile.gave_this_month += kudos_to_give
         from_profile.gave_total += kudos_to_give
         from_profile.put()
-        self.redirect('/')
+        self.redirect('/kudos/%s' % kudos.key().id())
+
+class CertificateHandler(webapp.RequestHandler):
+    def get(self, kudos_id):
+        kudos = Kudos.get_by_id(int(kudos_id))
+        if kudos:
+            self.response.out.write(template.render('templates/certificate.html', locals()))
+        else:
+            self.redirect('/')
 
 class CronHandler(webapp.RequestHandler):  
     #def get(self):
@@ -162,6 +181,7 @@ class CronHandler(webapp.RequestHandler):
 def main():
     application = webapp.WSGIApplication([
         ('/', MainHandler), 
+        ('/kudos/(\d+)', CertificateHandler),
         ('/reset_points', CronHandler),
         ('/worker/user', UserWorker), ], debug=True)
     util.run_wsgi_app(application)

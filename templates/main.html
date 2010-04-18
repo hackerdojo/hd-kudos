@@ -18,10 +18,18 @@
 
 <h2>Give kudos</h2>
 {% if user %}
+
+<div style="float: right; font-size: x-large; text-align: right; margin-top: -35px; line-height: 16px; margin-right: 5px;">
+  <span style="font-size: x-small;">You have {{profile.to_give}} left to give this month</span><br />
+  <span style="color: #d50025;">{{points_remaining}}</span>{{points_used}}
+</div>
+{% ifequal profile.to_give 0 %}
+<p style="margin-left: 20px;">
+  <strong>You've run out of kudos to give!</strong><br />
+  <span style="font-size: smaller; padding-left: 2px;">I guess you'll have to wait until next month...</span></p>
+{% else %}
 <form action="/" method="post" onsubmit="return !$('#submit')[0].disabled">
   <table>
-    {% ifequal profile.to_give 0 %}
-    {% else %}
     <tr><td class="label">Who gets kudos:</td><td class="label">How much:</td><td></td></tr>
     <tr><td>
       <input type="text" onkeyup="updateUser()" onblur="updateUser()" id="user_name" size="18" style="font-size: 18px;"/> 
@@ -30,16 +38,15 @@
       <select name="points" style="color: #d50025; font-size: 14px;">
         {% for points in point_options %}<option value="{{points.0}}">{{points.1}}</option>{% endfor %}
       </select>
-    </td><td>
+    </td></tr>
+    <tr><td colspan="2" class="label" style="font-size: ;">What for:</td></tr>
+    <tr><td colspan="2"><input type="text" name="reason" style="width: 100%; font-size: 14px;"/></td><td>
       <input type="submit" disabled="disabled" id="submit" value="Give em" />
     </td></tr>
-    {% endifequal %}
-    
-    <tr><td colspan="3" class="label">You have {{profile.to_give}} left to give this month</td></tr>
-    <tr><td colspan="3" style="font-size: 32px; line-height: 20px;"><span style="color: #d50025;">{{points_remaining}}</span>{{points_used}}
-</td></tr>
   </table>    
-  </form>
+</form>
+{% endifequal %}
+
 {% else %}
 <p><a href="{{login_url}}">Login</a> to give kudos!</p>
 {% endif %}
