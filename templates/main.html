@@ -4,7 +4,7 @@
   var names = {{names}};
   var usernames = {{usernames}};
   function updateUser() {
-    var name = $('#user_name').val().trim();
+    var name = $('#user_name').val().replace(/^\s\s*/, '').replace(/\s\s*$/, '');
     if ($.inArray(name, names) != -1) {
       $('#user_to').val(usernames[name]);
       $('#submit')[0].disabled = false;
