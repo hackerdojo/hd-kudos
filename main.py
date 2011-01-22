@@ -5,7 +5,7 @@ from google.appengine.api.labs import taskqueue
 from django.utils import simplejson
 import datetime
 
-from shared.api import damain
+from shared.api import domain
 
 MONTHLY_POINTS = 10
 
