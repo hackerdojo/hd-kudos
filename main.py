@@ -5,21 +5,10 @@ from google.appengine.api.labs import taskqueue
 from django.utils import simplejson
 import datetime
 
+from shared.api import domain
+
 MONTHLY_POINTS = 10
 
-# Hacker Dojo Domain API helper with caching
-def dojo(path, cache_ttl=3600):
-    base_url = 'http://domain.hackerdojo.com'
-    resp = memcache.get(path)
-    if not resp:
-        resp = urlfetch.fetch(base_url + path, deadline=10)
-        try:
-            resp = simplejson.loads(resp.content)
-        except Exception, e:
-            resp = []
-            cache_ttl = 10
-        memcache.set(path, resp, cache_ttl)
-    return resp
 
 def fullname(username):
     fullname = memcache.get('/users/%s:fullname' % username)
@@ -34,7 +23,7 @@ class UserWorker(webapp.RequestHandler):
     def post(self):
         username = self.request.get('username')
         month_ttl = 3600*24*28
-        user = dojo('/users/%s' % username, month_ttl)
+        user = domain('/users/%s' % username, month_ttl)
         memcache.set('/users/%s:fullname' % username, "%s %s" % (user['first_name'], user['last_name']), month_ttl)
 
 def username(user):
@@ -116,7 +105,7 @@ class MainHandler(webapp.RequestHandler):
             
         names = []
         usernames = {}
-        for u in dojo('/users'):
+        for u in domain('/users'):
             name = fullname(u)
             if not u == username(user):
                 usernames[name] = u
@@ -131,7 +120,7 @@ class MainHandler(webapp.RequestHandler):
 
     def post(self):
         user = users.get_current_user()
-        if not user or not self.request.get('user_to') in dojo('/users'):
+        if not user or not self.request.get('user_to') in domain('/users'):
             self.redirect('/')
             return
         from_profile = Profile.get_by_user(user)
