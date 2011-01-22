@@ -5,7 +5,7 @@ from google.appengine.api.labs import taskqueue
 from django.utils import simplejson
 import datetime
 
-from shared.api import domain
+from shared.api import damain
 
 MONTHLY_POINTS = 10
 
@@ -155,11 +155,25 @@ class CertificateHandler(webapp.RequestHandler):
         else:
             self.redirect('/')
 
+class CronHandler(webapp.RequestHandler):  
+    def get(self):
+        self.post()
+    
+    def post(self):
+        for profile in Profile.all():
+            if not memcache.get('monthly:%s' % profile.key().id()):
+                profile.to_give = MONTHLY_POINTS
+                profile.gave_this_month = 0
+                profile.received_this_month = 0
+                profile.put()
+                memcache.set('monthly:%s' % profile.key().id(), True, 3600*24*30)
+        self.response.out.write("Finished.")
 
 def main():
     application = webapp.WSGIApplication([
         ('/', MainHandler), 
         ('/kudos/(\d+)', CertificateHandler),
+        ('/reset_points', CronHandler),
         ('/worker/user', UserWorker), ], debug=True)
     util.run_wsgi_app(application)
 
