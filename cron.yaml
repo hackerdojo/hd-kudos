@@ -1,4 +1,0 @@
-cron:
-- description: reseting points to give out
-  url: /reset_points
-  schedule: every 24 hours

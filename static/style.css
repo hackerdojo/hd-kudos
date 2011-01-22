@@ -1,8 +1,18 @@
-body { font-family: Verdana,Arial,sans-serif; margin: 0px;}
+body { font-family: arial, verdana, arial, sans-serif; margin: 0px;}
+
+
+
 #wrapper { margin-left: auto; margin-right: auto; width: 700px; }
 
 #top a:visited { color: blue;}
-#top { height: 20px; border-bottom: 1px solid #ccc; text-align: right; font-size: 12px; padding-right: 5px; padding-top: 4px; }
+#top { 
+    height: 20px; 
+    border-bottom: 1px solid #ccc; 
+    font-size: 12px; 
+    padding-right: 10px; 
+    padding-top: 5px; 
+    padding-left: 10px;
+}
 
 #header { margin-left: auto; margin-right: auto; width: 670px; height: 125px;}
 #header img { margin-right: 10px;}
@@ -20,7 +30,7 @@ table td { padding-left: 10px; padding-top: 4px;}
 
 form div { margin-top: 10px; }
 
-label { display: block; font-size: smaller;}
+label { display: block; }
 
 a:visited { color: blue;}
 
@@ -28,6 +38,6 @@ a:visited { color: blue;}
 #primary { background: white; width: 660px; padding: 10px; -moz-border-radius: 8px; -webkit-border-radius: 8px;}
 h4 { font-size: smaller; }
 
-.label { font-size: smaller; font-weight: bold; margin-top: 10px;}
+.label { margin-top: 10px;}
 #content h2 { margin-bottom: 5px; margin-top: 5px;}
 #content table { margin-bottom: 20px;}
