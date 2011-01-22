@@ -86,13 +86,6 @@ class MainHandler(webapp.RequestHandler):
         user = users.get_current_user()
         profile = Profile.get_by_user(user)
         if user:
-            if not memcache.get('monthly:%s' % profile.key().id()):
-                profile.to_give = MONTHLY_POINTS
-                profile.gave_this_month = 0
-                profile.received_this_month = 0
-                profile.put()
-                memcache.set('monthly:%s' % profile.key().id(), True, 3600*24*30)
-            
             logout_url = users.create_logout_url('/')
             points_remaining = "&hearts;"*profile.to_give
             points_used = "&hearts;"*(MONTHLY_POINTS-profile.to_give)
@@ -150,6 +143,7 @@ class MainHandler(webapp.RequestHandler):
 class CertificateHandler(webapp.RequestHandler):
     def get(self, kudos_id):
         kudos = Kudos.get_by_id(int(kudos_id))
+        user = users.get_current_user()
         if kudos:
             self.response.out.write(template.render('templates/certificate.html', locals()))
         else:
