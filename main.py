@@ -11,6 +11,7 @@ from google.appengine.api import urlfetch
 from google.appengine.api import users
 from google.appengine.api.labs import taskqueue
 
+import mail
 from shared.api import domain
 
 MONTHLY_POINTS = 10
@@ -28,8 +29,9 @@ class UserWorker(webapp.RequestHandler):
     def post(self):
         username = self.request.get('username')
         month_ttl = 3600*24*28
-        user = domain('/users/%s' % username, month_ttl)
-        memcache.set('/users/%s:fullname' % username, "%s %s" % (user['first_name'], user['last_name']), month_ttl)
+        user = domain('/users/%s' % username)
+        if len(user):
+            memcache.set('/users/%s:fullname' % username, "%s %s" % (user['first_name'], user['last_name']), month_ttl)
 
 def username(user):
     return user.nickname().split('@')[0] if user else None
@@ -125,6 +127,8 @@ class MainHandler(webapp.RequestHandler):
         # monthly leader board
         receive_leaders = Profile.top_receivers_this_month()
         give_leaders = Profile.top_givers_this_month()
+        this_month = datetime.datetime.now().strftime('%B')
+        
         self.response.out.write(template.render('templates/main.html', locals()))
 
     def post(self):
@@ -139,7 +143,7 @@ class MainHandler(webapp.RequestHandler):
         if kudos_to_give < 0:
             kudos_to_give = 0
         # If profile doesn't exist it will be created, no matter if user exists (which is fine)
-        to_profile = Profile.get_by_user(users.User(self.request.get('user_to') + '@hackerdojo.com'))
+        to_profile =    Profile.get_by_user(users.User(self.request.get('user_to') + '@hackerdojo.com'))
         to_profile.received_total += kudos_to_give
         to_profile.received_this_month += kudos_to_give
         to_profile.put()
@@ -154,6 +158,7 @@ class MainHandler(webapp.RequestHandler):
         from_profile.gave_this_month += kudos_to_give
         from_profile.gave_total += kudos_to_give
         from_profile.put()
+        mail.send_kudos_email(kudos, from_profile, to_profile)
         self.redirect('/kudos/%s' % kudos.key().id())
 
 class CertificateHandler(webapp.RequestHandler):
@@ -174,10 +179,45 @@ class RefreshHandler(webapp.RequestHandler):
             profile.refresh()
         self.response.out.write("Finished.")
 
+class GraphHandler(webapp.RequestHandler):
+    def get(self):
+        graph = {'nodes': [], 'links': []}
+        
+        kudos_links = {}
+        nodes = set()
+        for kudos in Kudos.all():
+            source = kudos.user_from.email()
+            target = kudos.user_to.email()
+            nodes.add(source)
+            nodes.add(target)
+            key = '%s-%s' % (source, target)
+            if not key in kudos_links:
+                kudos_links[key] = [source, target, 0]
+            kudos_links[key][2] += kudos.amount
+            
+        email_index = {}
+        index = 0
+        for profile in Profile.all():
+            if profile.user.email() in nodes:
+                graph['nodes'].append({'nodeName': profile.fullname(), 'group': 1})
+                email_index[profile.user.email()] = index
+                index += 1
+        
+        for link in kudos_links.values():
+            try:
+                graph['links'].append({
+                    'source': email_index[link[0]], 
+                    'target': email_index[link[1]], 
+                    'value': link[2]})
+            except KeyError:
+                continue
+        self.response.out.write("var kudos = %s;" % simplejson.dumps(graph))
+
 def main():
     application = webapp.WSGIApplication([
         ('/', MainHandler), 
         ('/kudos/(\d+)', CertificateHandler),
+        ('/graph.js', GraphHandler),
         ('/refresh', RefreshHandler),
         ('/worker/user', UserWorker), ], debug=True)
     util.run_wsgi_app(application)

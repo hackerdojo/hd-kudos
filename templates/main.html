@@ -1,4 +1,9 @@
 {% extends 'base.html' %}
+{% block head %}
+<script type="text/javascript" src="http://vis.stanford.edu/protovis/protovis-r3.2.js"></script>
+<script type="text/javascript" src="http://vis.stanford.edu/protovis/ex/miserables.js"></script>
+<script type="text/javascript" src="http://kudos.hackerdojo.com/graph.js"></script>
+{% endblock %}
 {% block content %}
 <script type="text/javascript">
   var names = {{names}};
@@ -17,77 +22,102 @@
 <div id="primary" style="padding-top: -10px;">
 
 
-{% if user %}
-<div style="width: 42%; float: right; border-left: 2px solid #eee; height: 170px; padding-left: 20px;">
-  <h2>Received kudos</h2>
-  <table style="margin-top: 5px; margin-left: 20px;">
-    <tr><td style="font-size: 38px; font-weight: bold; text-align: right;">{{profile.received_this_month}}</td><td>kudos received this month</td></tr>
-    <tr><td style="font-size: 24px; font-weight: bold;  text-align: right;">{{profile.received_total}}</td><td>kudos received ever</td></tr>
-  </table>
-</div>
-
-
-<div style="width: 48%;">
-
-<div style="float: right; font-size: x-large; margin-left: 30px; margin-top: 0px;" title="Kudos to give refreshes every month">
-  <span style="color: #cd355c;">{{points_remaining}}</span>{{points_used}}
-</div>
-<h2>Give kudos</h2>
-
-{% ifequal profile.to_give 0 %}
-<p style="margin-left: 20px; margin-bottom: 100px;">
-  <strong>You've run out of kudos to give!</strong><br />
-  <span style="font-size: smaller; padding-left: 2px;">I guess you'll have to wait until next month...</span></p>
-{% else %}
-<form action="/" method="post" onsubmit="return !$('#submit')[0].disabled">
-  <table style="width: 100%;">
-    <tr>
-      <td width="70%" class="label">Who gets kudos:</td>
-      <td class="label">How much:</td>
-    </tr>
-    <tr>
-      <td>
-        <input type="text" onkeyup="updateUser()" onblur="updateUser()" id="user_name" style="font-size: 14px; width: 100%;"/> 
-        <input type="hidden" name="user_to" id="user_to" />    
-      </td>
-      <td>
-        <select name="points" style="font-size: 14px;">
-        {% for points in point_options %}<option value="{{points.0}}">{{points.1}}</option>{% endfor %}
-        </select>
-      </td>
-    </tr>
-    <tr><td colspan="2" class="label" style="font-size: ;">What for:</td></tr>
-    <tr><td colspan="2"><input type="text" name="reason" style="width: 80%; font-size: 14px;"/> <input type="submit" disabled="disabled" id="submit" value="Give em" /></td></tr>
-  </table>    
-</form>
-{% endifequal %}
-</div>
-
-{% endif %}
+  {% if user %}
+  <div style="width: 42%; float: right; border-left: 2px solid #eee; height: 170px; padding-left: 20px;">
+    <h2>Received kudos</h2>
+    <table style="margin-top: 5px; margin-left: 20px;">
+      <tr><td style="font-size: 38px; font-weight: bold; text-align: right;">{{profile.received_this_month}}</td><td>kudos received this month</td></tr>
+      <tr><td style="font-size: 24px; font-weight: bold;  text-align: right;">{{profile.received_total}}</td><td>kudos received ever</td></tr>
+    </table>
+  </div>
   
-
   
-<h2>This month</h2>
-<div style="overflow: auto; width: 100%;">
-<div style="float: left; margin-right: 80px;">
-<h3 style="margin-left: 20px; margin-bottom: 0px;">Most Received</h3>
-<table>
-{% for p in receive_leaders %}
-<tr><td style="font-size: 24px; font-weight: bold;  text-align: right;">{{p.received_this_month}}</td><td>{{p.fullname}}</td></tr>
-{% endfor %}
-</table>
-</div>
+  <div style="width: 48%;">
+  
+  <div style="float: right; font-size: x-large; margin-left: 30px; margin-top: 0px;" title="Kudos to give refreshes every month">
+    <span style="color: #cd355c;">{{points_remaining}}</span>{{points_used}}
+  </div>
+  <h2>Give kudos</h2>
+  
+  {% ifequal profile.to_give 0 %}
+  <p style="margin-left: 20px; margin-bottom: 100px;">
+    <strong>You've run out of kudos to give!</strong><br />
+    <span style="font-size: smaller; padding-left: 2px;">I guess you'll have to wait until next month...</span></p>
+  {% else %}
+  <form action="/" method="post" onsubmit="return !$('#submit')[0].disabled">
+    <table style="width: 100%;">
+      <tr>
+        <td width="70%" class="label">Who gets kudos:</td>
+        <td class="label">How much:</td>
+      </tr>
+      <tr>
+        <td>
+          <input type="text" onkeyup="updateUser()" onblur="updateUser()" id="user_name" style="font-size: 14px; width: 100%;"/> 
+          <input type="hidden" name="user_to" id="user_to" />    
+        </td>
+        <td>
+          <select name="points" style="font-size: 14px;">
+          {% for points in point_options %}<option value="{{points.0}}">{{points.1}}</option>{% endfor %}
+          </select>
+        </td>
+      </tr>
+      <tr><td colspan="2" class="label" style="font-size: ;">What for:</td></tr>
+      <tr><td colspan="2"><input type="text" name="reason" style="width: 80%; font-size: 14px;"/> <input type="submit" disabled="disabled" id="submit" value="Give em" /></td></tr>
+    </table>    
+  </form>
+  {% endifequal %}
+  </div>
+  
+  {% endif %}
+    
+  
+  <div style="float: right; border-left: 2px solid #eee; padding-left: 10px;">
+    <h2 style="padding-left: 10px;">Total kudos graph</h2>
+    <script type="text/javascript+protovis">
 
-<div style="float: left;">
-<h3 style="margin-left: 20px; margin-bottom: 0px;">Most Gave</h3>
-<table>
-{% for p in give_leaders %}
-<tr><td style="font-size: 24px; font-weight: bold;  text-align: right;">{{p.gave_this_month}}</td><td>{{p.fullname}}</td></tr>
-{% endfor %}
-</table>
-</div>
-</div>
+    var w = 400,
+        h = 300;
 
+    var vis = new pv.Panel()
+        .width(w)
+        .height(h)
+        .fillStyle("white")
+        .event("mousedown", pv.Behavior.pan())
+        .event("mousewheel", pv.Behavior.zoom())
+        .transform(new pv.Transform().scale(1.75).translate(-80, -75));
+
+    var force = vis.add(pv.Layout.Force)
+        .nodes(kudos.nodes)
+        .links(kudos.links);
+
+    force.springLength = 40;
+    force.springConstant = 1;
+    force.link.add(pv.Line);
+
+    force.node.add(pv.Dot)
+        .size(function(d) (d.linkDegree + 4) * Math.pow(this.scale, -1.5))
+        .fillStyle(function(d) "#cd355c")
+        .strokeStyle(function() this.fillStyle().darker())
+        .lineWidth(1)
+        .title(function(d) d.nodeName)
+        .event("mousedown", pv.Behavior.drag())
+        .event("drag", force);
+
+    vis.render();
+
+        </script>
+  </div>
+    
+  <h2>{{this_month}} most kudos</h2>
+  <div style="overflow: auto; width: 40%; margin-top: 10px; margin-left: 20px;">
+      <table>
+        {% for p in receive_leaders %}
+        <tr><td style="font-size: 24px; font-weight: bold;  text-align: right;">{{p.received_this_month}}</td><td>{{p.fullname}}</td></tr>
+        {% endfor %}
+      </table>
+  </div>
+
+  <div style="clear: both;"></div>
 </div>
 
 <script type="text/javascript">
