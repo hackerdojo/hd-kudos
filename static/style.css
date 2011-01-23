@@ -34,10 +34,12 @@ label { display: block; }
 
 a:visited { color: blue;}
 
-#content { border-top: 3px solid #d50025; background: #eee; padding: 10px; }
+#content { border-top: 3px solid #cd355c; background: #eee; padding: 10px; }
 #primary { background: white; width: 660px; padding: 10px; -moz-border-radius: 8px; -webkit-border-radius: 8px;}
 h4 { font-size: smaller; }
 
 .label { margin-top: 10px;}
 #content h2 { margin-bottom: 5px; margin-top: 5px;}
 #content table { margin-bottom: 20px;}
+
+.ac_over { background-color: #cd355c !important; }

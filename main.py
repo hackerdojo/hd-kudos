@@ -4,11 +4,11 @@ from google.appengine.api import urlfetch, memcache, users
 from google.appengine.api.labs import taskqueue
 from django.utils import simplejson
 import datetime
+import time
 
 from shared.api import domain
 
 MONTHLY_POINTS = 10
-
 
 def fullname(username):
     fullname = memcache.get('/users/%s:fullname' % username)
@@ -36,9 +36,20 @@ class Profile(db.Model):
     received_this_month = db.IntegerProperty(default=0)
     gave_total          = db.IntegerProperty(default=0)
     gave_this_month     = db.IntegerProperty(default=0)
+    month_refreshed     = db.StringProperty(default='')
 
     def fullname(self):
         return fullname(username(self.user))
+
+    
+    def refresh(self):
+        current_month = datetime.datetime.now().strftime('%B')
+        if self.month_refreshed != current_month:
+            self.month_refreshed = current_month
+            self.to_give = MONTHLY_POINTS
+            self.gave_this_month = 0
+            self.received_this_month = 0
+            self.put()
 
     @classmethod
     def get_by_user(cls, user):
@@ -155,12 +166,7 @@ class CronHandler(webapp.RequestHandler):
     
     def post(self):
         for profile in Profile.all():
-            if not memcache.get('monthly:%s' % profile.key().id()):
-                profile.to_give = MONTHLY_POINTS
-                profile.gave_this_month = 0
-                profile.received_this_month = 0
-                profile.put()
-                memcache.set('monthly:%s' % profile.key().id(), True, 3600*24*30)
+            profile.refresh()
         self.response.out.write("Finished.")
 
 def main():
