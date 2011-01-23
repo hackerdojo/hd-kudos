@@ -68,6 +68,9 @@
   {% endifequal %}
   </div>
   
+  {% else %}
+  <h2>Pay tribute to Dojo community contributors!</h2>
+  <p style="margin-bottom: 30px;">Have you seen somebody working long hours fixing things around Dojo, contributing back to the community, or just generally deserving of some thanks? <a href="{{login_url}}">Login</a> and give kudos to fellow members!</p>
   {% endif %}
     
   
@@ -108,7 +111,7 @@
         </script>
   </div>
     
-  <h2>{{this_month}} most kudos</h2>
+  <h2>{{this_month}}'s most kudos</h2>
   <div style="overflow: auto; width: 40%; margin-top: 10px; margin-left: 20px;">
       <table>
         {% for p in receive_leaders %}
