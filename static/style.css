@@ -2,7 +2,7 @@ body { font-family: arial, verdana, arial, sans-serif; margin: 0px;}
 
 
 
-#wrapper { margin-left: auto; margin-right: auto; width: 700px; }
+#wrapper { margin-left: auto; margin-right: auto; width: 800px; }
 
 #top a:visited { color: blue;}
 #top { 
@@ -14,7 +14,7 @@ body { font-family: arial, verdana, arial, sans-serif; margin: 0px;}
     padding-left: 10px;
 }
 
-#header { margin-left: auto; margin-right: auto; width: 670px; height: 125px;}
+#header { margin-left: auto; margin-right: auto; width: 770px; height: 125px;}
 #header img { margin-right: 10px;}
 #header h1 { font-size: 42px; margin-top: 20px; padding-top: 10px; margin-bottom: 0px; padding-bottom: 0px;}
 #header h2 { font-size: x-large; margin: 0px; }
@@ -35,7 +35,7 @@ label { display: block; }
 a:visited { color: blue;}
 
 #content { border-top: 3px solid #cd355c; background: #eee; padding: 10px; }
-#primary { background: white; width: 660px; padding: 10px; -moz-border-radius: 8px; -webkit-border-radius: 8px;}
+#primary { background: white; width: 760px; padding: 10px; -moz-border-radius: 8px; -webkit-border-radius: 8px;}
 h4 { font-size: smaller; }
 
 .label { margin-top: 10px;}

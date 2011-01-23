@@ -16,54 +16,61 @@
 </script>
 <div id="primary" style="padding-top: -10px;">
 
-<h2>Give kudos</h2>
-{% if user %}
 
-<div style="float: right; font-size: x-large; text-align: right; margin-top: -35px; line-height: 16px; margin-right: 5px;">
-  <span style="font-size: x-small;">You have {{profile.to_give}} left to give this month</span><br />
+{% if user %}
+<div style="width: 42%; float: right; border-left: 2px solid #eee; height: 170px; padding-left: 20px;">
+  <h2>Received kudos</h2>
+  <table style="margin-top: 5px; margin-left: 20px;">
+    <tr><td style="font-size: 38px; font-weight: bold; text-align: right;">{{profile.received_this_month}}</td><td>kudos received this month</td></tr>
+    <tr><td style="font-size: 24px; font-weight: bold;  text-align: right;">{{profile.received_total}}</td><td>kudos received ever</td></tr>
+  </table>
+</div>
+
+
+<div style="width: 48%;">
+
+<div style="float: right; font-size: x-large; margin-left: 30px; margin-top: 0px;" title="Kudos to give refreshes every month">
   <span style="color: #cd355c;">{{points_remaining}}</span>{{points_used}}
 </div>
+<h2>Give kudos</h2>
+
 {% ifequal profile.to_give 0 %}
-<p style="margin-left: 20px;">
+<p style="margin-left: 20px; margin-bottom: 100px;">
   <strong>You've run out of kudos to give!</strong><br />
   <span style="font-size: smaller; padding-left: 2px;">I guess you'll have to wait until next month...</span></p>
 {% else %}
 <form action="/" method="post" onsubmit="return !$('#submit')[0].disabled">
-  <table>
-    <tr><td class="label">Who gets kudos:</td><td class="label">How much:</td><td></td></tr>
-    <tr><td>
-      <input type="text" onkeyup="updateUser()" onblur="updateUser()" id="user_name" size="18" style="font-size: 18px;"/> 
-      <input type="hidden" name="user_to" id="user_to" />    
-    </td><td>
-      <select name="points" style="color: #d50025; font-size: 14px;">
+  <table style="width: 100%;">
+    <tr>
+      <td width="70%" class="label">Who gets kudos:</td>
+      <td class="label">How much:</td>
+    </tr>
+    <tr>
+      <td>
+        <input type="text" onkeyup="updateUser()" onblur="updateUser()" id="user_name" style="font-size: 14px; width: 100%;"/> 
+        <input type="hidden" name="user_to" id="user_to" />    
+      </td>
+      <td>
+        <select name="points" style="font-size: 14px;">
         {% for points in point_options %}<option value="{{points.0}}">{{points.1}}</option>{% endfor %}
-      </select>
-    </td></tr>
+        </select>
+      </td>
+    </tr>
     <tr><td colspan="2" class="label" style="font-size: ;">What for:</td></tr>
-    <tr><td colspan="2"><input type="text" name="reason" style="width: 100%; font-size: 14px;"/></td><td>
-      <input type="submit" disabled="disabled" id="submit" value="Give em" />
-    </td></tr>
+    <tr><td colspan="2"><input type="text" name="reason" style="width: 80%; font-size: 14px;"/> <input type="submit" disabled="disabled" id="submit" value="Give em" /></td></tr>
   </table>    
 </form>
 {% endifequal %}
+</div>
 
-{% else %}
-<p><a href="{{login_url}}">Login</a> to give kudos!</p>
 {% endif %}
   
-{% if user %}
-<h2>Received kudos</h2>
-<table style="margin-top: -10px;">
-  <tr><td style="font-size: 38px; font-weight: bold; text-align: right;">{{profile.received_this_month}}</td><td>kudos received this month</td></tr>
-  <tr><td style="font-size: 24px; font-weight: bold;  text-align: right;">{{profile.received_total}}</td><td>kudos received ever</td></tr>
-</table>
-{% endif %}
 
   
-<h2>Most kudos this month</h2>
+<h2>This month</h2>
 <div style="overflow: auto; width: 100%;">
 <div style="float: left; margin-right: 80px;">
-<h3 style="margin-left: 20px; margin-bottom: 0px;">Received</h3>
+<h3 style="margin-left: 20px; margin-bottom: 0px;">Most Received</h3>
 <table>
 {% for p in receive_leaders %}
 <tr><td style="font-size: 24px; font-weight: bold;  text-align: right;">{{p.received_this_month}}</td><td>{{p.fullname}}</td></tr>
@@ -72,7 +79,7 @@
 </div>
 
 <div style="float: left;">
-<h3 style="margin-left: 20px; margin-bottom: 0px;">Gave</h3>
+<h3 style="margin-left: 20px; margin-bottom: 0px;">Most Gave</h3>
 <table>
 {% for p in give_leaders %}
 <tr><td style="font-size: 24px; font-weight: bold;  text-align: right;">{{p.gave_this_month}}</td><td>{{p.fullname}}</td></tr>

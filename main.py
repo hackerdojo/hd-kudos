@@ -1,10 +1,15 @@
-from google.appengine.ext import webapp, db
-from google.appengine.ext.webapp import util, template
-from google.appengine.api import urlfetch, memcache, users
-from google.appengine.api.labs import taskqueue
-from django.utils import simplejson
 import datetime
 import time
+
+from django.utils import simplejson
+from google.appengine.ext import webapp
+from google.appengine.ext import db
+from google.appengine.ext.webapp import util
+from google.appengine.ext.webapp import template
+from google.appengine.api import memcache
+from google.appengine.api import urlfetch
+from google.appengine.api import users
+from google.appengine.api.labs import taskqueue
 
 from shared.api import domain
 
@@ -160,7 +165,7 @@ class CertificateHandler(webapp.RequestHandler):
         else:
             self.redirect('/')
 
-class CronHandler(webapp.RequestHandler):  
+class RefreshHandler(webapp.RequestHandler):  
     def get(self):
         self.post()
     
@@ -173,7 +178,7 @@ def main():
     application = webapp.WSGIApplication([
         ('/', MainHandler), 
         ('/kudos/(\d+)', CertificateHandler),
-        ('/reset_points', CronHandler),
+        ('/refresh', RefreshHandler),
         ('/worker/user', UserWorker), ], debug=True)
     util.run_wsgi_app(application)
 

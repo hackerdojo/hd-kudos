@@ -1,4 +1,4 @@
 cron:
-- description: reseting points to give out
-  url: /reset_points
+- description: refreshing points to give out
+  url: /refresh
   schedule: every 24 hours
